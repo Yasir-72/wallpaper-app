@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wallpaperapp/screens/categorypage.dart';
+import 'package:Wallify/screens/categorypage.dart';
 
 // ignore: must_be_immutable
 class CatBlock extends StatefulWidget {

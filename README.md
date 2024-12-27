@@ -1,4 +1,4 @@
-# wallpaperapp
+# Wallify
 
 A new Flutter project.
 

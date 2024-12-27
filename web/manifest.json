@@ -1,6 +1,6 @@
 {
-    "name": "wallpaperapp",
-    "short_name": "wallpaperapp",
+    "name": "Wallify",
+    "short_name": "Wallify",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:wallpaperapp/controller/apioper.dart';
-import 'package:wallpaperapp/modal/categorymodal.dart';
-import 'package:wallpaperapp/modal/photosmodal.dart';
-import 'package:wallpaperapp/screens/fullscreen.dart';
-import 'package:wallpaperapp/widgets/catblock.dart';
-import 'package:wallpaperapp/widgets/searchbar.dart';
+import 'package:Wallify/controller/apioper.dart';
+import 'package:Wallify/modal/categorymodal.dart';
+import 'package:Wallify/modal/photosmodal.dart';
+import 'package:Wallify/screens/fullscreen.dart';
+import 'package:Wallify/widgets/catblock.dart';
+import 'package:Wallify/widgets/searchbar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -50,12 +50,26 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: Text(
+        title: const Text(
           "Wallpaper App",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.red,
+                Colors.deepOrange,
+                Colors.pink,
+                Colors.blue,
+                Colors.lightBlueAccent,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: isLoading
           ? Center(

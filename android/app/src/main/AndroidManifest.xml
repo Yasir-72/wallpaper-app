@@ -8,7 +8,7 @@
 
 
     <application
-        android:label="wallpaperapp"
+        android:label="Wallify"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
-import 'package:wallpaperapp/modal/categorymodal.dart';
-import 'package:wallpaperapp/modal/photosmodal.dart';
+import 'package:Wallify/modal/categorymodal.dart';
+import 'package:Wallify/modal/photosmodal.dart';
 
 List<PhotosModel> trendingWallpapers = [];
 List<PhotosModel> searchWallpapersList = [];
@@ -10,7 +10,7 @@ List<CategoryModel> cateogryModelList = [];
 
 class ApiOperartion {
   static Future<List<PhotosModel>> getTrendingWallpapers(
-      {int totalImages = 200}) async {
+      {int totalImages = 500}) async {
     List<PhotosModel> trendingWallpapers = [];
     int perPage = 80; // Maximum allowed per page
     int totalPages =
@@ -54,7 +54,7 @@ class ApiOperartion {
   static Future<List<PhotosModel>> searchWallpapers(String query) async {
     await http.get(
         Uri.parse(
-            "https://api.pexels.com/v1/search?query=$query&per_page=30&page=1"),
+            "https://api.pexels.com/v1/search?query=$query&per_page=400&page=1"),
         headers: {
           "Authorization":
               "wcTPHj1Q3qwWdrGFjiSHoU2uawGmxA7IQGH7C6FthDKjKdfxzzuxIMly"
@@ -70,8 +70,8 @@ class ApiOperartion {
     return searchWallpapersList;
   }
 
-  static List<CategoryModel> getCategoriesList() {
-    List cateogryName = [
+  static Future<List<CategoryModel>> getCategoriesList() async {
+    List<String> categoryNames = [
       "Cars",
       "Nature",
       "Bikes",
@@ -86,18 +86,27 @@ class ApiOperartion {
       "Music",
       "Travel",
       "Sports",
-      "Fashion"
     ]; // Add more categories here
+
     cateogryModelList.clear();
-    cateogryName.forEach((catName) async {
-      final _random = Random();
+    List<CategoryModel> categoryModelList = [];
+    for (var catName in categoryNames) {
+      // Fetch 300 wallpapers for each category
+      List<PhotosModel> categoryWallpapers = await searchWallpapers(catName);
 
-      PhotosModel photoModel =
-          (await searchWallpapers(catName))[0 + _random.nextInt(11 - 0)];
-      cateogryModelList
-          .add(CategoryModel(catImgUrl: photoModel.imgSrc, catName: catName));
-    });
+      if (categoryWallpapers.isNotEmpty) {
+        final _random = Random();
+        PhotosModel photoModel =
+            categoryWallpapers[_random.nextInt(categoryWallpapers.length)];
 
-    return cateogryModelList;
+        categoryModelList.add(CategoryModel(
+          catImgUrl: photoModel.imgSrc,
+          catName: catName,
+          wallpapers: categoryWallpapers,
+        ));
+      }
+    }
+
+    return categoryModelList;
   }
 }

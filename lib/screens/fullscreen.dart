@@ -1,4 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
 
 class FullScreen extends StatefulWidget {
   final String imgUrl;
@@ -10,70 +14,74 @@ class FullScreen extends StatefulWidget {
 }
 
 class _FullScreenState extends State<FullScreen> {
-  Future<String?> downloadImage(String url) async {
-    // Mock implementation
-    return "path_to_downloaded_image";
-  }
+  bool isDownloading = false;
 
-  // void showWallpaperOptions(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-  //     ),
-  //     builder: (BuildContext context) {
-  //       return Padding(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             const Text(
-  //               "Set Wallpaper",
-  //               style: TextStyle(
-  //                 fontSize: 18,
-  //                 fontWeight: FontWeight.bold,
-  //                 color: Colors.black,
-  //               ),
-  //             ),
-  //             const Divider(),
-  //             ListTile(
-  //               leading: const Icon(Icons.home, color: Colors.orange),
-  //               title: const Text("Home Screen"),
-  //               onTap: () => Navigator.pop(context),
-  //             ),
-  //             ListTile(
-  //               leading: const Icon(Icons.lock, color: Colors.orange),
-  //               title: const Text("Lock Screen"),
-  //               onTap: () => Navigator.pop(context),
-  //             ),
-  //             ListTile(
-  //               leading: const Icon(Icons.phone_android, color: Colors.orange),
-  //               title: const Text("Both Screens"),
-  //               onTap: () => Navigator.pop(context),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+  Future<void> downloadImage(String imageUrl) async {
+    try {
+      setState(() {
+        isDownloading = true;
+      });
+
+      String devicePathToSaveImage = "";
+      var time = DateTime.now().microsecondsSinceEpoch;
+
+      if (Platform.isAndroid) {
+        //   devicePathToSaveImage = "/storage/emulated/0/Download/image-$time.jpg";
+        // }
+        // // else {
+        var downloadDirectoryPath = await getApplicationDocumentsDirectory();
+        devicePathToSaveImage = "${downloadDirectoryPath.path}/image-$time.jpg";
+      }
+
+      File file = File(devicePathToSaveImage);
+      print('File path: $devicePathToSaveImage');
+
+      // HTTP GET request to fetch the image
+      var res = await get(Uri.parse(imageUrl));
+      if (res.statusCode == 200) {
+        // Save the image to the file
+        await file.writeAsBytes(res.bodyBytes);
+
+        // Save the image to the gallery
+        await ImageGallerySaver.saveFile(devicePathToSaveImage);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Downloading Completed!!'),
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Failed to download image'),
+          backgroundColor: Colors.red,
+        ));
+      }
+    } catch (error) {
+      print("Error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('An error occurred during the download.'),
+        backgroundColor: Colors.red,
+      ));
+    } finally {
+      setState(() {
+        isDownloading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          // Spacing from the left
-          FloatingActionButton.extended(
-            onPressed: () {
-              
-            },
-            label: const Text("Download" , style: TextStyle(fontSize: 18 ,fontWeight: FontWeight.bold, color: Colors.black),),
-            icon: const Icon(Icons.file_download, color: Colors.black,),
-            backgroundColor: Colors.orange,
-          ),
-        ],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: isDownloading
+            ? null
+            : () {
+                downloadImage(widget.imgUrl);
+              },
+        label: Text(
+          isDownloading ? "Downloading..." : "Download",
+          style: const TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        icon: const Icon(Icons.file_download, color: Colors.black),
+        backgroundColor: Colors.orange,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wallpaperapp/screens/searchpage.dart';
+import 'package:Wallify/screens/searchpage.dart';
 
 class SearchBarComponent extends StatelessWidget {
   SearchBarComponent({super.key});
