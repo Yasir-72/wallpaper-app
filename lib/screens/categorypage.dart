@@ -1,3 +1,4 @@
+import 'package:Wallify/widgets/info.dart';
 import 'package:flutter/material.dart';
 import 'package:Wallify/controller/apioper.dart';
 import 'package:Wallify/modal/photosmodal.dart';
@@ -36,26 +37,43 @@ class _CategoryPageState extends State<CategoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text(
-            "Wallify",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          centerTitle: true,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 255, 75, 85), // Vibrant pink-red
-                  Color.fromARGB(255, 255, 123, 150), // Soft coral pink
-                  Color.fromARGB(255, 129, 80, 209), // Rich purple
-                  Color.fromARGB(255, 67, 159, 247), // Vibrant blue
-                  Color.fromARGB(255, 49, 210, 255), // Aqua cyan
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+        title: const Text(
+          "Wallify",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 255, 75, 85), // Vibrant pink-red
+                Color.fromARGB(255, 255, 123, 150), // Soft coral pink
+                Color.fromARGB(255, 129, 80, 209), // Rich purple
+                Color.fromARGB(255, 67, 159, 247), // Vibrant blue
+                Color.fromARGB(255, 49, 210, 255), // Aqua cyan
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          )),
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showModalBottomSheet<void>(
+                context: context,
+                builder: (BuildContext context) {
+                  return Infopage();
+                },
+              );
+            },
+            icon: Icon(
+              Icons.info_outline,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -95,7 +113,7 @@ class _CategoryPageState extends State<CategoryPage> {
             isLoading
                 ? const Center(
                     child: CircularProgressIndicator(
-                    color:Color(0xFFF48FB1),
+                      color: Color(0xFFF48FB1),
                     ),
                   )
                 : categoryResults.isEmpty

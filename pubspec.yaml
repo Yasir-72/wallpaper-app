@@ -40,6 +40,7 @@ dependencies:
   permission_handler:
   image_gallery_saver: 
   path_provider: 
+  url_launcher: ^6.3.1
 
 
 dev_dependencies:
