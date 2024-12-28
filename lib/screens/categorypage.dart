@@ -153,7 +153,6 @@ class _CategoryPageState extends State<CategoryPage> {
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.orange,
                                 borderRadius: BorderRadius.circular(20),
                                 image: DecorationImage(
                                   image: NetworkImage(
