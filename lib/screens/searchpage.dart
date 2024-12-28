@@ -58,17 +58,30 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: const Text(
-          "Wallpaper App",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        centerTitle: true,
-      ),
+          title: const Text(
+            "Wallpaper Ap",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 255, 75, 85), // Vibrant pink-red
+                  Color.fromARGB(255, 255, 123, 150), // Soft coral pink
+                  Color.fromARGB(255, 129, 80, 209), // Rich purple
+                  Color.fromARGB(255, 67, 159, 247), // Vibrant blue
+                  Color.fromARGB(255, 49, 210, 255), // Aqua cyan
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          )),
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(
-                color: Colors.orange,
+                color: Color(0xFFF48FB1),
               ),
             )
           : errorMessage.isNotEmpty

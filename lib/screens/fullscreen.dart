@@ -81,7 +81,7 @@ class _FullScreenState extends State<FullScreen> {
               fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
         ),
         icon: const Icon(Icons.file_download, color: Colors.black),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.pink[200],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(

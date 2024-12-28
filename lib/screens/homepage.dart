@@ -50,31 +50,30 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Wallpaper App",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.red,
-                Colors.deepOrange,
-                Colors.pink,
-                Colors.blue,
-                Colors.lightBlueAccent,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+          title: const Text(
+            "Wallify",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
           ),
-        ),
-      ),
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 255, 75, 85), // Vibrant pink-red
+                  Color.fromARGB(255, 255, 123, 150), // Soft coral pink
+                  Color.fromARGB(255, 129, 80, 209), // Rich purple
+                  Color.fromARGB(255, 67, 159, 247), // Vibrant blue
+                  Color.fromARGB(255, 49, 210, 255), // Aqua cyan
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          )),
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: Colors.orange, // Optional: Add color to the loader
+                color: Colors.pink[200], // Optional: Add color to the loader
               ),
             )
           : trendingWallList.isEmpty
@@ -135,7 +134,6 @@ class _HomePageState extends State<HomePage> {
                                 tag: trendingWallList[index].imgSrc,
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.orange,
                                     borderRadius: BorderRadius.circular(
                                         20), // Rounded edges
                                     image: DecorationImage(
