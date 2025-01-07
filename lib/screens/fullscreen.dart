@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:http/http.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+
 import 'package:path_provider/path_provider.dart';
 
 class FullScreen extends StatefulWidget {
@@ -15,73 +16,164 @@ class FullScreen extends StatefulWidget {
 
 class _FullScreenState extends State<FullScreen> {
   bool isDownloading = false;
+  bool isSettingWallpaper = false;
 
-  Future<void> downloadImage(String imageUrl) async {
+  Future<void> setWallpaper(String imageUrl, int wallpaperLocation) async {
     try {
       setState(() {
-        isDownloading = true;
+        isSettingWallpaper = true;
       });
 
-      String devicePathToSaveImage = "";
-      var time = DateTime.now().microsecondsSinceEpoch;
-
-      if (Platform.isAndroid) {
-        //   devicePathToSaveImage = "/storage/emulated/0/Download/image-$time.jpg";
-        // }
-        // // else {
-        var downloadDirectoryPath = await getApplicationDocumentsDirectory();
-        devicePathToSaveImage = "${downloadDirectoryPath.path}/image-$time.jpg";
-      }
-
-      File file = File(devicePathToSaveImage);
-      print('File path: $devicePathToSaveImage');
-
-      // HTTP GET request to fetch the image
+      // Download the image to a temporary location
       var res = await get(Uri.parse(imageUrl));
       if (res.statusCode == 200) {
-        // Save the image to the file
-        await file.writeAsBytes(res.bodyBytes);
+        var tempDir = await getTemporaryDirectory();
+        String tempPath = '${tempDir.path}/temp_wallpaper.jpg';
+        File tempFile = File(tempPath);
+        await tempFile.writeAsBytes(res.bodyBytes);
 
-        // Save the image to the gallery
-        await ImageGallerySaver.saveFile(devicePathToSaveImage);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Downloading Completed!!'),
-        ));
+        // Set the wallpaper
+        bool result = await WallpaperManager.setWallpaperFromFile(
+          tempPath,
+          wallpaperLocation,
+        );
+
+        if (result) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Wallpaper set successfully!'),
+          ));
+        } else {
+          throw Exception("Failed to set wallpaper.");
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Failed to download image'),
-          backgroundColor: Colors.red,
-        ));
+        throw Exception("Failed to download image for wallpaper.");
       }
     } catch (error) {
       print("Error: $error");
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('An error occurred during the download.'),
+        content: Text('An error occurred while setting the wallpaper.'),
         backgroundColor: Colors.red,
       ));
     } finally {
       setState(() {
-        isDownloading = false;
+        isSettingWallpaper = false;
       });
     }
+  }
+
+  void showWallpaperOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Set as Wallpaper",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(
+                  Icons.home,
+                  color: Colors.orange,
+                ),
+                title: Text(
+                  "Home Screen",
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  setWallpaper(widget.imgUrl, WallpaperManager.HOME_SCREEN);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock,color: Colors.orange,),
+                title: const Text("Lock Screen",
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold)),
+                onTap: () {
+                  Navigator.pop(context);
+                  setWallpaper(widget.imgUrl, WallpaperManager.LOCK_SCREEN);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.wallpaper,color: Colors.orange,),
+                title: const Text("Both Screens",
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold)),
+                onTap: () {
+                  Navigator.pop(context);
+                  setWallpaper(widget.imgUrl, WallpaperManager.BOTH_SCREEN);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: isDownloading
-            ? null
-            : () {
-                downloadImage(widget.imgUrl);
-              },
-        label: Text(
-          isDownloading ? "Downloading..." : "Download",
-          style: const TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        icon: const Icon(Icons.file_download, color: Colors.black),
-        backgroundColor: Colors.pink[200],
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: isDownloading
+                ? null
+                : () async {
+                    setState(() {
+                      isDownloading = true;
+                    });
+                    var res = await get(Uri.parse(widget.imgUrl));
+                    if (res.statusCode == 200) {
+                      var tempDir = await getTemporaryDirectory();
+                      String tempPath = '${tempDir.path}/downloaded_image.jpg';
+                      File tempFile = File(tempPath);
+                      await tempFile.writeAsBytes(res.bodyBytes);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Image downloaded successfully!'),
+                      ));
+                    }
+                    setState(() {
+                      isDownloading = false;
+                    });
+                  },
+            label: Text(
+              isDownloading ? "Downloading..." : "Download",
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            icon: const Icon(Icons.file_download, color: Colors.black),
+            backgroundColor: Color(0xFFFFB341),
+          ),
+          SizedBox(height: 10),
+          FloatingActionButton.extended(
+            onPressed: isSettingWallpaper ? null : showWallpaperOptions,
+            label: Text(
+              isSettingWallpaper ? "Setting..." : "Set Wallpaper",
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            icon: const Icon(Icons.wallpaper, color: Colors.black),
+            backgroundColor: Color(0xFFFFB341),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
